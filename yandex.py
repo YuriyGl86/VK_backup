@@ -16,8 +16,8 @@ class Yandex:
         response = requests.put(link, headers=headers, params=params)
         if response.status_code == 201:
             print("Success")
-        else:
-            print(response.text)
+        # else:
+        #     print(response.text)
 
     def get_new_folder_path(self, folder_path):
         path = '/'

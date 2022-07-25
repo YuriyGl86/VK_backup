@@ -21,8 +21,8 @@ class VK:
         response = requests.get(url, params={**self.params, **params})
         return response.json()
 
-    def get_alboms(self):
+    def get_albums(self):
         url = 'https://api.vk.com/method/photos.getAlbums'
-        params = {'user_ids': self.id}
+        params = {'user_ids': self.id, 'need_system': 1}
         response = requests.get(url, params={**self.params, **params})
         return response.json()
