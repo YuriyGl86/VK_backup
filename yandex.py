@@ -3,7 +3,7 @@ import requests
 
 class Yandex:
 
-    def __init__(self, token):
+    def __init__(self, token, **kwargs):
         self.__token = token
 
     def get_headers(self):
@@ -32,15 +32,17 @@ class Yandex:
         response = requests.get(link, headers=headers, params=params)
         return response.json()
 
-    def upload_file_to_disk(self, path, file):
+    def upload_file_to_disk(self, path_to_save, file_name):
+        path = path_to_save + file_name
         upload_link = self.get_link_for_upload(path)['href']
-        with open(file, 'rb') as data:
+        with open(file_name, 'rb') as data:
             response = requests.put(upload_link, data=data)
         response.raise_for_status()
         if response.status_code == 201:
             print("Success")
 
-    def upload_data_to_disk(self, path, data):
+    def upload_data_to_disk(self, path_to_save, picture_name, data):
+        path = path_to_save + picture_name
         upload_link = self.get_link_for_upload(path)['href']
         response = requests.put(upload_link, data=data)
         response.raise_for_status()
