@@ -23,7 +23,7 @@ def backup_fotos_from_album(path_to_save, album_id='profile', foto_count=5, disk
     if isinstance(backuper, GoogleDrive):
         path_to_save = folder_id
 
-    fotos = vk.get_photos_from_albom(album_id=album_id)
+    fotos = vk.get_photos_from_album(album_id=album_id)
     # pprint(fotos)
     json_data = []
     for foto in fotos['response']['items']:
@@ -55,5 +55,5 @@ def backup_all_albums(path_to_save, *args, **kwargs):
 
 
 if __name__ == '__main__':
-    # backup_fotos_from_album(path_to_backup, disk_to_save='Yandex')  # Yandex или Google
-    backup_all_albums(path_to_backup, disk_to_save='Google')  # Yandex или Google
+    backup_fotos_from_album(path_to_backup, disk_to_save='Yandex')  # Yandex или Google
+    # backup_all_albums(path_to_backup, disk_to_save='Google')  # Yandex или Google

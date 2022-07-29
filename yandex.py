@@ -40,7 +40,7 @@ class Yandex:
             response = requests.put(upload_link, data=data)
         response.raise_for_status()
         if response.status_code == 201:
-            print(f'File {file_name} successfully uploaded')
+            print(f'File {file_name} successfully uploaded to YandexDisk')
 
     def upload_data_to_disk(self, path_to_save, picture_name, data):
         path = path_to_save + picture_name
@@ -48,4 +48,4 @@ class Yandex:
         response = requests.put(upload_link, data=data)
         response.raise_for_status()
         if response.status_code == 201:
-            print(f'File {picture_name} successfully uploaded')
+            print(f'File {picture_name} successfully uploaded to YandexDisk')
