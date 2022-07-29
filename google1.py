@@ -3,6 +3,7 @@ from pprint import pprint
 
 import os.path
 
+import requests
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -20,6 +21,7 @@ class GoogleDrive:
     def __init__(self, creds=None, SCOPES='https://www.googleapis.com/auth/drive.file', *args, **kwargs):
         self.creds = creds
         self.SCOPES = [SCOPES]
+        self.root_id = None
         self.get_authorization()
 
     def get_authorization(self):
@@ -40,6 +42,7 @@ class GoogleDrive:
             # Save the credentials for the next run
             with open('token.json', 'w') as token:
                 token.write(self.creds.to_json())
+        print('authorization Success')
 
     def upload_data_to_disk(self, path_to_save, picture_name, picture):
         try:
@@ -72,7 +75,6 @@ class GoogleDrive:
                 'parents': [path_to_save],
 
             }
-
             media = MediaFileUpload(file_name, mimetype='image/jpeg', resumable=True)
             # pylint: disable=maybe-no-member
             file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
@@ -96,21 +98,26 @@ class GoogleDrive:
             }
 
             # pylint: disable=maybe-no-member
-            file = service.files().create(body=file_metadata, fields='id').execute()
+            file = service.files().create(body=file_metadata, fields='id, parents').execute()
             print(F'Folder {name} has created with ID: "{file.get("id")}".')
 
         except HttpError as error:
             print(F'An error occurred: {error}')
             file = None
 
-        return file.get('id')
+        return file.get('id'), file.get('parents')
 
     def get_new_folder_path(self, folder_path):
-        foldres = folder_path.strip('/').split('/')
-        folder_id = self.get_new_folder(foldres[0])
-        for subfolder in foldres[1:]:
-            folder_id = self.get_new_folder(subfolder, parent=folder_id)
-
+        folders = folder_path.strip('/').split('/')
+        parent = self.get_root_id()
+        for subfolder in folders:
+            check = self.check_path_for_existing(subfolder, parent)
+            if check:
+                folder_id = check
+            else:
+                folder_id = self.get_new_folder(subfolder, parent=parent)[0]
+            parent = folder_id
+        print(f'Folders {folder_path} have successfully created')
         return folder_id
 
     def get_file_list(self):
@@ -123,22 +130,38 @@ class GoogleDrive:
             if not items:
                 print('No files found.')
                 return
-            print('Files:')
-            for item in items:
-                print(item)
-                print(item['parents'])
+            # print('Files:')
+            # for item in items:
+            #     print(item)
             return items
         except HttpError as error:
             # TODO(developer) - Handle errors from drive API.
             print(f'An error occurred: {error}')
 
+    def get_root_id(self):
+        if self.root_id is None:
+            temp = self.get_new_folder('temp')
+            self.root_id = temp[1][0]
+            self.delete_file(temp[0])
+        return self.root_id
 
-    def check_path_for_existing(self, folder_name, parent='root'):
+    def check_path_for_existing(self, folder_name, parent):
         file_list = self.get_file_list()
         if file_list:
             for file in self.get_file_list():
 
                 if file['name'] == folder_name and file['mimeType'] == 'application/vnd.google-apps.folder' and \
-                        file['parents'] == parent:
+                        file['parents'][0] == parent:
                     return file['id']
         return
+
+    def delete_file(self, file):
+        try:
+            service = build('drive', 'v3', credentials=self.creds)
+            fileDelete = file
+            file = service.files().delete(fileId=fileDelete).execute()
+            # print(F'File {file} has deleted.')
+
+        except HttpError as error:
+            print(F'An error occurred: {error}')
+            file = None

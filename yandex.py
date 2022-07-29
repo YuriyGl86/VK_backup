@@ -24,6 +24,7 @@ class Yandex:
         for subfolder in folder_path.strip('/').split('/'):
             path = path + subfolder.strip('/') + '/'
             self.get_new_folder(path)
+        print(f'Folders {folder_path} have successfully created')
 
     def get_link_for_upload(self, path, overwrite=True):
         link = 'https://cloud-api.yandex.net/v1/disk/resources/upload'
@@ -39,7 +40,7 @@ class Yandex:
             response = requests.put(upload_link, data=data)
         response.raise_for_status()
         if response.status_code == 201:
-            print("Success")
+            print(f'File {file_name} successfully uploaded')
 
     def upload_data_to_disk(self, path_to_save, picture_name, data):
         path = path_to_save + picture_name
@@ -47,4 +48,4 @@ class Yandex:
         response = requests.put(upload_link, data=data)
         response.raise_for_status()
         if response.status_code == 201:
-            print("Success")
+            print(f'File {picture_name} successfully uploaded')

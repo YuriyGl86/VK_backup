@@ -34,7 +34,6 @@ def backup_fotos_from_album(path_to_save, album_id='profile', foto_count=5, disk
             picture_url = sorted(foto['sizes'], key=lambda x: sizes.find(x['type']))
             picture = requests.get(picture_url[-1]['url']).content
             picture_name = f'{foto_id}_{foto_likes}_likes.jpg'
-            # path_to_picture = path_to_save + picture_name ###########################удалить
             backuper.upload_data_to_disk(path_to_save, picture_name, picture)
             json_data.append({'file_name': picture_name, 'size': 'w'})
             foto_count -= 1
@@ -44,9 +43,7 @@ def backup_fotos_from_album(path_to_save, album_id='profile', foto_count=5, disk
     backuper.upload_file_to_disk(path_to_save, json_file_name)
 
 
-# backup_fotos_from_album(path_to_backup, disk_to_save='Google')
-
-def backup_all_albums_to_yandex(path_to_save, *args, **kwargs):
+def backup_all_albums(path_to_save, *args, **kwargs):
     # ya.get_new_folder_path(path_to_save)
     albums = vk.get_albums()
     # pprint(albums)
@@ -57,4 +54,6 @@ def backup_all_albums_to_yandex(path_to_save, *args, **kwargs):
         backup_fotos_from_album(path, album_id=album_id, *args, **kwargs)
 
 
-backup_all_albums_to_yandex(path_to_backup, disk_to_save='Google')
+if __name__ == '__main__':
+    # backup_fotos_from_album(path_to_backup, disk_to_save='Yandex')  # Yandex или Google
+    backup_all_albums(path_to_backup, disk_to_save='Google')  # Yandex или Google
