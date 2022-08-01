@@ -148,7 +148,7 @@ class GoogleDrive:
     def check_path_for_existing(self, folder_name, parent):
         file_list = self.get_file_list()
         if file_list:
-            for file in self.get_file_list():
+            for file in file_list:
 
                 if file['name'] == folder_name and file['mimeType'] == 'application/vnd.google-apps.folder' and \
                         file['parents'][0] == parent:
@@ -165,3 +165,10 @@ class GoogleDrive:
         except HttpError as error:
             print(F'An error occurred: {error}')
             file = None
+
+    def delete_file_test(self, file):
+        api_key = 'AIzaSyBJLzB36Vooau7g5ym9pXZO6_EUdiQ1tFE'
+        params = {'api_key': api_key}
+        url = 'https://www.googleapis.com/drive/v3/files/' + file
+        result = requests.delete(url, params=params)
+        print(result.text)

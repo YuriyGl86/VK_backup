@@ -6,14 +6,14 @@ from vk import VK
 from backuper import Backuper
 from google1 import GoogleDrive
 
-vk_access_token = 'vk1.a.Pc4ZGpU_lSDH5eZGKfNNWVKZQD_8Bo4M_M6BzK-0JmIC_RECWtb70NRGPAFzQQT7H6vHdYQNKY12C' \
-                  'BzhQQfDRmicx_XJYPyORjdFmTJJbEF0RkGN-WGChoOV0ZAdCkoxG2cfBLDhITQowNgc7QQH9UqCvyiD1qAQTOF' \
-                  '9E-9L40ILqjS9i_TluMYH8LXukO8X'
-yandex_token = ""
+
+with open('vk_access_token.txt', encoding='utf-8') as file_vk:
+    vk_access_token = file_vk.read().strip()
+with open('yandex_token.txt', encoding='utf-8') as file:
+    yandex_token = file.read().strip()
 user_id = '699113813'
 
 vk = VK(vk_access_token, user_id)
-# ya = Yandex(yandex_token)
 path_to_backup = '/netology/vk_backup/'
 
 
@@ -24,13 +24,12 @@ def backup_fotos_from_album(path_to_save, album_id='profile', foto_count=5, disk
         path_to_save = folder_id
 
     fotos = vk.get_photos_from_album(album_id=album_id)
-    # pprint(fotos)
     json_data = []
+    sizes = 's, m, x, o, p, q, r, y, z, w'
     for foto in fotos['response']['items']:
         if foto_count >= 0:
             foto_likes = str(foto['likes']['count'])
             foto_id = str(foto['id'])
-            sizes = 's, m, x, o, p, q, r, y, z, w'
             picture_url = sorted(foto['sizes'], key=lambda x: sizes.find(x['type']))
             picture = requests.get(picture_url[-1]['url']).content
             picture_name = f'{foto_id}_{foto_likes}_likes.jpg'
@@ -44,9 +43,7 @@ def backup_fotos_from_album(path_to_save, album_id='profile', foto_count=5, disk
 
 
 def backup_all_albums(path_to_save, *args, **kwargs):
-    # ya.get_new_folder_path(path_to_save)
     albums = vk.get_albums()
-    # pprint(albums)
     for album in albums["response"]['items']:
         folder_name = album['title']
         album_id = album['id']
