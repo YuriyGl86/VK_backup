@@ -16,6 +16,7 @@ class Yandex:
         response = requests.put(link, headers=headers, params=params)
         if response.status_code == 201:
             print("Success")
+            return response.status_code
         # else:
         #     print(response.text)
 
@@ -49,3 +50,14 @@ class Yandex:
         response.raise_for_status()
         if response.status_code == 201:
             print(f'File {picture_name} successfully uploaded to YandexDisk')
+
+    def delete_folder(self, folder_path):
+        link = 'https://cloud-api.yandex.net/v1/disk/resources'
+        headers = self.get_headers()
+        params = {'path': folder_path, 'permanently': True}
+        response = requests.delete(link, headers=headers, params=params)
+        if response.status_code == 204:
+            print("Success")
+            return response.status_code
+        else:
+            print(response.text)
